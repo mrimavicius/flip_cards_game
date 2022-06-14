@@ -48,7 +48,7 @@ function checkForMatch() {
         setTimeout(() => {
             firstCard.style.background = "darkkhaki"
             secondCard.style.background = "darkkhaki"
-        }, 5000)
+        }, 1000)
     }
 }
 
