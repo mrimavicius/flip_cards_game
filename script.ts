@@ -1,86 +1,86 @@
-const game = document.getElementById("game") as HTMLElement
+const container = document.querySelector('#game') as HTMLElement
 
+interface ItemInterface {
+    div: HTMLElement,
+    symbol: string
+}
 
-let numOfCards: number = 20
-let cardsArray: string[] = [
-    'fa-flag',
-    'fa-flag',
-    'fa-dragon',
-    'fa-dragon',
-    'fa-apple-whole',
-    'fa-apple-whole',
-    'fa-candy-cane',
-    'fa-candy-cane',
-    'fa-btc',
-    'fa-btc',
-    'fa-bicycle',
-    'fa-bicycle',
-    'fa-basket-shopping',
-    'fa-basket-shopping',
-    'fa-anchor',
-    'fa-anchor',
-    'fa-cat',
-    'fa-cat',
-    'fa-peace',
-    'fa-peace'
+const icons: string[] = [
+    "fa-cat",
+    "fa-crow",
+    "fa-dog",
+    "fa-dragon",
+    "fa-fish",
+    "fa-frog",
+    "fa-horse",
+    "fa-otter",
+    "fa-paw",
+    "fa-spider"
 ]
 
-let shuffledCardsArray = cardsArray
-    .map(value => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value)
+let iconsMerged: string[] = [...icons, ...icons]
 
-let hasClickedCard = false
+let selected: ItemInterface[] = []
 
-let firstCard, secondCard
+function closeCards() {
+    setTimeout(() => {
+        selected[0].div.style.backgroundColor = "darkkhaki"
+        selected[0].div.innerHTML = ``
 
-function disableCards() {
-    firstCard.removeEventListener("click", flipCard)
-    secondCard.removeEventListener("click", flipCard)
+        selected[1].div.style.backgroundColor = "darkkhaki"
+        selected[1].div.innerHTML = ``
+
+        selected = []
+    }, 1000)
 }
 
-function checkForMatch() {
+function cardsMatch() {
+    selected[0].div.classList.add("open")
+    selected[1].div.classList.add("open")
 
-    if (firstCard.innerHTML === secondCard.innerHTML) {
-        disableCards()
-        return
+    selected = []
+}
+
+function compareSymbols() {
+
+    if (selected[0].symbol === selected[1].symbol) {
+        cardsMatch()
     } else {
-        setTimeout(() => {
-            firstCard.style.background = "darkkhaki"
-            secondCard.style.background = "darkkhaki"
-        }, 1000)
+        closeCards()
     }
-}
-
-function flipCard() {
-
-    if (!hasClickedCard) {
-        hasClickedCard = true
-        firstCard = this as HTMLElement
-        firstCard.style.background = "white"
-        return
-    }
-
-    secondCard = this
-    secondCard.style.background = "white"
-    hasClickedCard = false
-
-    checkForMatch()
 
 }
 
-function appendCards() {
-    for (let i = 0; i < numOfCards; i++) {
+function cardClicked(e: any) {
+    if (e.target.className.includes('open')) return
 
-        game.innerHTML += `
-        <div class="card"><i class="fa-solid ${shuffledCardsArray[i]}"></i></div>
-        `
+    if (selected.length < 2) {
+        const { value: iconName } = e.target.attributes[1]
+        e.target.style.backgroundColor = "white"
+        e.target.innerHTML = `<i class="fas ${iconName}"></i>`
+
+        const item: ItemInterface = {
+            div: e.target,
+            symbol: iconName
+        }
+
+        selected.push(item)
+
+        if (selected.length === 2) compareSymbols()
     }
 
-    const card = document.querySelectorAll(".card") as NodeListOf<HTMLElement>
-
-    card.forEach(x => x.addEventListener("click", flipCard))
 
 }
 
-appendCards()
+function appendHtml() {
+    iconsMerged = iconsMerged.sort((a, b) => 0.5 - Math.random());
+
+    for (let i = 0; i < iconsMerged.length; i++) {
+        container.innerHTML += `<div class="card" iconName="${iconsMerged[i]}"></div>`
+    }
+
+    const cards = document.querySelectorAll('.card') as NodeListOf<HTMLElement>
+    cards.forEach(x => x.onclick = cardClicked)
+}
+
+appendHtml()
